@@ -92,7 +92,11 @@ class ViewController: UIViewController {
                 filterNameLabel.textAlignment = .center
                 filterNameLabel.font = UIFont(name: "Helvetica-Regular", size: 8)
                 
-                let context = CIContext()
+                @available(iOS, deprecated: 12.0)
+                let openGLContext = EAGLContext(api: .openGLES2)
+                @available(iOS, deprecated: 12.0)
+                let context = CIContext(eaglContext: openGLContext!)
+                
                 let filter = CIFilter(name: filterName)
                 let coreImage = CIImage(image: self.editingImage)
                 filter!.setDefaults()
@@ -142,7 +146,7 @@ class ViewController: UIViewController {
                           animations: { self.masterImageView.image = sender.backgroundImage(for: .normal) },
                           completion: nil)
         filterName = filterList[sender.tag]
-        
+        sliderViewSlider.setValue(25, animated: true)
         checkFilterName(name: filterName)
     }
     
@@ -167,12 +171,18 @@ class ViewController: UIViewController {
             self.indicator.startAnimating()
             
             DispatchQueue.global(qos: .userInteractive).async {
-                let tempContext = CIContext()
+                
+                @available(iOS, deprecated: 12.0)
+                let openGLContext = EAGLContext(api: .openGLES2)
+                @available(iOS, deprecated: 12.0)
+                let context = CIContext(eaglContext: openGLContext!)
                 self.tempFilter!.setDefaults()
                 
                 switch self.filterName {
                 case "CIZoomBlur":
-                    self.tempFilter!.setValue(value, forKey: kCIInputAmountKey)
+                    if #available(iOS 12.0, *) {
+                        self.tempFilter!.setValue(value, forKey: kCIInputAmountKey)
+                    }
                     self.tempFilter!.setValue(self.centerVector, forKey: kCIInputCenterKey)
                 case  "CITorusLensDistortion":
                     self.tempFilter!.setValue(self.centerVector, forKey: kCIInputCenterKey)
@@ -190,7 +200,7 @@ class ViewController: UIViewController {
                 let coreImage = CIImage(image: self.orignalImage)
                 self.tempFilter!.setValue(coreImage, forKey: kCIInputImageKey)
                 let filteredImageData = self.tempFilter!.value(forKey: kCIOutputImageKey) as! CIImage
-                let filteredImageRef = tempContext.createCGImage(filteredImageData, from: filteredImageData.extent)
+                let filteredImageRef = context.createCGImage(filteredImageData, from: filteredImageData.extent)
                 self.editingImage = UIImage(cgImage: filteredImageRef!)
                 
                 DispatchQueue.main.async {
