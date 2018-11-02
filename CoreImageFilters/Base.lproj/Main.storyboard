@@ -56,6 +56,29 @@
                                             <action selector="openLibraryPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="0OU-6C-9u0"/>
                                         </connections>
                                     </button>
+                                    <visualEffectView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hXk-PY-d1Y">
+                                        <rect key="frame" x="138" y="244" width="100" height="85"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" insetsLayoutMarginsFromSafeArea="NO" id="hW3-D9-zgd">
+                                            <rect key="frame" x="0.0" y="0.0" width="100" height="85"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="0.75" translatesAutoresizingMaskIntoConstraints="NO" id="wTl-LW-3hn">
+                                                    <rect key="frame" x="8" y="62" width="84" height="17"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="11"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="aUk-bu-n1K">
+                                                    <rect key="frame" x="32" y="22" width="37" height="37"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                                    <color key="color" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </activityIndicatorView>
+                                            </subviews>
+                                        </view>
+                                        <blurEffect style="light"/>
+                                    </visualEffectView>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
@@ -88,6 +111,9 @@
                     </view>
                     <connections>
                         <outlet property="filterScroll" destination="lbM-Qu-SMB" id="05S-la-Wan"/>
+                        <outlet property="indicator" destination="aUk-bu-n1K" id="aSs-zI-xVZ"/>
+                        <outlet property="indicatorLabel" destination="wTl-LW-3hn" id="7yc-OS-eiF"/>
+                        <outlet property="indicatorView" destination="hXk-PY-d1Y" id="cqg-c3-JCq"/>
                         <outlet property="masterImageView" destination="mgp-tx-gmU" id="t35-SQ-ABU"/>
                         <outlet property="sliderView" destination="gLJ-g8-Byg" id="wEF-hb-wpW"/>
                         <outlet property="sliderViewLabel" destination="gLf-Mr-uum" id="rdN-Pb-kFD"/>

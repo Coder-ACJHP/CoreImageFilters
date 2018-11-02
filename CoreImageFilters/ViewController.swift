@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  CoreImageFilters
 //
-//  Created by Onur Işık on 2.11.2018.
+//  Created by Coder ACJHP on 2.11.2018.
 //  Copyright © 2018 Onur Işık. All rights reserved.
 //
 
@@ -18,6 +18,7 @@ class ViewController: UIViewController {
     let gapBetweenButtons: CGFloat = 5
     
     var filterName: String!
+    var labelName: String!
     var centerVector: CIVector!
     var scaleFactor: CGFloat!
     var editingImage: UIImage!
@@ -25,10 +26,10 @@ class ViewController: UIViewController {
     var panGesture: UIPanGestureRecognizer!
     let imagePicker = UIImagePickerController()
     var filterList: [String] = [
-        "CIColorCubeWithColorSpace", "CIColorInvert", "CIColorMonochrome", "CIColorPosterize",
-        "CIFalseColor", "CIMaximumComponent", "CIMinimumComponent", "CIPhotoEffectChrome", "CIPhotoEffectFade",
+        "CIPointillize", "CIColorCubeWithColorSpace", "CIColorPosterize", "CICrystallize", "CIColorInvert", "CIColorMonochrome",
+        "CIFalseColor", "CIMaximumComponent", "CIMinimumComponent", "CILineOverlay", "CIPhotoEffectChrome", "CIPhotoEffectFade",
         "CIPhotoEffectInstant", "CIPhotoEffectNoir", "CIPhotoEffectProcess", "CIPhotoEffectTonal", "CIPhotoEffectTransfer",
-        "CISepiaTone", "CIVignette", "CIVignetteEffect", "CITorusLensDistortion", "CITwirlDistortion", "CIVortexDistortion",
+        "CISepiaTone", "CIVignetteEffect", "CITorusLensDistortion", "CITwirlDistortion", "CIVortexDistortion",
         "CIGaussianBlur", "CIMotionBlur", "CIZoomBlur"
     ]
 
@@ -36,7 +37,6 @@ class ViewController: UIViewController {
         "CIVortexDistortion", "CITorusLensDistortion", "CITwirlDistortion", "CIGaussianBlur", "CIMotionBlur", "CIZoomBlur", "CIVignetteEffect"
     ]
 
-    var indicator = UIActivityIndicatorView(style: .whiteLarge)
     var orignalImage: UIImage = UIImage(named: "GirlImage")!
     
     @IBOutlet weak var sliderViewLabel: UILabel!
@@ -44,6 +44,9 @@ class ViewController: UIViewController {
     @IBOutlet weak var sliderView: UIView!
     @IBOutlet weak var masterImageView: UIImageView!
     @IBOutlet weak var filterScroll: UIScrollView!
+    @IBOutlet weak var indicatorView: UIVisualEffectView!
+    @IBOutlet weak var indicator: UIActivityIndicatorView!
+    @IBOutlet weak var indicatorLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,10 +58,14 @@ class ViewController: UIViewController {
         editingImage = self.masterImageView.image!
         centerVector = CIVector(x: self.editingImage.size.width/2, y: self.editingImage.size.height/2)
         
-        self.view.addSubview(indicator)
-        indicator.center = self.view.center
-        self.indicator.startAnimating()
+        indicatorView.layer.masksToBounds = true
+        indicatorView.layer.cornerRadius = 5.0
         
+        DispatchQueue.main.async {
+            self.showLoadingIndicator()
+        }
+        
+        self.addLabels()
         self.addFilters()
     }
     
@@ -66,6 +73,43 @@ class ViewController: UIViewController {
         super.viewWillAppear(animated)
         
         self.sliderView.isHidden = true
+        self.indicatorView.isHidden = true
+    }
+    
+    fileprivate func showLoadingIndicator() {
+        self.indicatorView.isHidden = false
+        self.indicator.startAnimating()
+        self.indicatorView.setNeedsDisplay()
+
+    }
+    
+    fileprivate func hideLoadingIndicator() {
+        self.indicatorView.isHidden = true
+        self.indicator.stopAnimating()
+    }
+    
+    fileprivate func addLabels() {
+        
+        var xCoordForLabel: CGFloat = 5
+        
+        filterList.forEach { (name) in
+            
+            self.labelName = name
+            if labelName.hasPrefix("CIColor") {
+                labelName = String(labelName.dropFirst(7))
+            } else {
+                labelName = String(labelName.dropFirst(2))
+            }
+            
+            let filterNameLabel = UILabel(frame: CGRect(x: xCoordForLabel, y: self.buttonHeight + 4, width: self.buttonWidth, height: 20))
+            filterNameLabel.text = labelName
+            filterNameLabel.textColor = .black
+            filterNameLabel.textAlignment = .center
+            filterNameLabel.font = .systemFont(ofSize: 8)
+            self.filterScroll.addSubview(filterNameLabel)
+            
+            xCoordForLabel += self.buttonWidth + self.gapBetweenButtons
+        }
     }
     
     fileprivate func addFilters() {
@@ -85,12 +129,7 @@ class ViewController: UIViewController {
                 filterButton.layer.cornerRadius = 5.0
                 filterButton.clipsToBounds = true
                 
-                let filterNameLabel = UILabel(frame: CGRect(x: self.xCoord, y: self.buttonHeight + 4, width: self.buttonWidth, height: 20))
                 let filterName = self.filterList[index]
-                filterNameLabel.text = filterName
-                filterNameLabel.textColor = .black
-                filterNameLabel.textAlignment = .center
-                filterNameLabel.font = UIFont(name: "Helvetica-Regular", size: 8)
                 
                 @available(iOS, deprecated: 12.0)
                 let openGLContext = EAGLContext(api: .openGLES2)
@@ -105,6 +144,10 @@ class ViewController: UIViewController {
                     if filterName == listFilterName {
                         if filterName != "CIGaussianBlur" && filterName != "CIMotionBlur" && filterName != "CIZoomBlur" {
                             filter?.setValue(self.centerVector, forKey: kCIInputCenterKey)
+                        }
+                        
+                        if filterName == "CIPointtillize" {
+                            filter?.setValue(5, forKey: kCIInputRadiusKey)
                         }
                     }
                 })
@@ -122,11 +165,19 @@ class ViewController: UIViewController {
                     
                     self.xCoord += self.buttonWidth + self.gapBetweenButtons
                     self.filterScroll.addSubview(filterButton)
-                    self.filterScroll.addSubview(filterNameLabel)
                     self.filterScroll.setNeedsDisplay()
+
+                    if filterName.hasPrefix("CIColor") {
+                        self.labelName = String(filterName.dropFirst(7))
+                    } else {
+                        self.labelName = String(filterName.dropFirst(2))
+                    }
+                    
+                    self.indicatorLabel.text = self.labelName
+                    self.indicatorLabel.setNeedsDisplay()
                     
                     if itemCount == self.filterList.count - 1 {
-                        self.indicator.stopAnimating()
+                        self.hideLoadingIndicator()
                     }
                     
                 }
@@ -168,7 +219,9 @@ class ViewController: UIViewController {
         let value = Int(sender.value)
         
         guard let touch = event.allTouches?.first, touch.phase != .ended else {
-            self.indicator.startAnimating()
+            
+            self.showLoadingIndicator()
+            self.indicatorLabel.text = self.labelName
             
             DispatchQueue.global(qos: .userInteractive).async {
                 
@@ -205,7 +258,7 @@ class ViewController: UIViewController {
                 
                 DispatchQueue.main.async {
                     
-                    self.indicator.stopAnimating()
+                    self.hideLoadingIndicator()
                     self.masterImageView.image = self.editingImage
                     
                 }
